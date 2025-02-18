@@ -1,0 +1,22 @@
+cmake_minimum_required(VERSION 3.20)
+
+project(cmake_eye_tracker VERSION 1.0 LANGUAGES CXX)
+
+set(CMAKE_CXX_STANDARD 23)
+set(CMAKE_CXX_STANDARD_REQUIRED True)
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++23 -O3")
+
+set(CMAKE_INSTALL_PREFIX ${PROJECT_SOURCE_DIR})
+
+set(EYE_TRACKER_INSTALL_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/include)
+set(EYE_TRACKER_INSTALL_BIN_DIR ${PROJECT_SOURCE_DIR}/bin)
+set(EYE_TRACKER_INSTALL_LIB_DIR ${PROJECT_SOURCE_DIR}/lib)
+
+set(EYE_TRACKER_HEADERS_DIR ${PROJECT_SOURCE_DIR}/src/app)
+
+include_directories(${EYE_TRACKER_INSTALL_INCLUDE_DIR})
+include_directories(${EYE_TRACKER_HEADERS_DIR})
+
+add_subdirectory(src)
+add_subdirectory(test)
+
