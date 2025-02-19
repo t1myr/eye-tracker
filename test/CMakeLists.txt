@@ -1,13 +1,13 @@
 cmake_minimum_required(VERSION 3.20)
 project(eye_tracker_test)
 
-add_subdirectory(lib/googletest)
+enable_testing()
 
-include_directories(${EYE_TRACKER_HEADERS_DIR})
-include_directories(lib/googletest/googletest/include)
+find_package(GTest CONFIG REQUIRED)
+
 
 file(GLOB_RECURSE SRC_FILES "src/*.cpp")
 
 add_executable(eye_tracker_tests ${SOURCE_FILES} main.cpp)
-target_link_libraries(eye_tracker_tests eye_tracker_lib gtest)
+target_link_libraries(eye_tracker_tests PRIVATE eye_tracker_lib GTest::gtest GTest::gtest_main GTest::gmock GTest::gmock_main)
 install(TARGETS eye_tracker_tests DESTINATION bin)

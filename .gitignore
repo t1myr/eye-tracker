@@ -3,3 +3,4 @@
 /lib
 CMakePresets.json
 .vscode
+/vcpkg_installed

@@ -17,6 +17,6 @@ set(EYE_TRACKER_HEADERS_DIR ${PROJECT_SOURCE_DIR}/src/app)
 include_directories(${EYE_TRACKER_INSTALL_INCLUDE_DIR})
 include_directories(${EYE_TRACKER_HEADERS_DIR})
 
-add_subdirectory(src)
+add_subdirectory(app)
 add_subdirectory(test)
 
