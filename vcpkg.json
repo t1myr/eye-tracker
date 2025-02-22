@@ -2,6 +2,8 @@
     "dependencies": [
         "opencv",
         "gtest",
-        "dbus"
+        "dbus",
+        "dlib",
+        "glog"
     ]
 }

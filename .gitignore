@@ -4,3 +4,4 @@
 CMakePresets.json
 .vscode
 /vcpkg_installed
+*png*
