@@ -5,3 +5,4 @@ CMakePresets.json
 .vscode
 /vcpkg_installed
 /data
+*.dat
