@@ -6,8 +6,7 @@ enable_testing()
 find_package(GTest CONFIG REQUIRED)
 
 
-file(GLOB_RECURSE SRC_FILES "src/*.cpp")
+file(GLOB_RECURSE SOURCE_FILES "src/*.cpp")
 
 add_executable(eye_tracker_tests ${SOURCE_FILES} main.cpp)
 target_link_libraries(eye_tracker_tests PRIVATE eye_tracker_lib GTest::gtest GTest::gtest_main GTest::gmock GTest::gmock_main)
-install(TARGETS eye_tracker_tests DESTINATION bin)

@@ -1,9 +1,9 @@
 {
-    "dependencies": [
-        "opencv",
-        "gtest",
-        "dbus",
-        "dlib",
-        "glog"
-    ]
+  "dependencies": [
+    "dlib",
+    "spdlog",
+    "gtest",
+    "opencv",
+    "lapack"
+  ]
 }

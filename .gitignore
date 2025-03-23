@@ -6,3 +6,4 @@ CMakePresets.json
 /vcpkg_installed
 /data
 *.dat
+*.txt
