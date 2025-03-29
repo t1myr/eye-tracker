@@ -39,7 +39,7 @@ public:
      * @brief Выдача id задачи
      * @return const std::string& имя 
      */
-    uint32_t getId() const noexcept;
+    TaskId getId() const noexcept;
 
     //---------------Изменение состояния----------------------------------------
     /// @brief Запускаем задачу
@@ -113,7 +113,7 @@ private:
 
     std::thread m_thread; //Поток, в котором работает задача
     std::string m_name; //Имя задачи
-    uint32_t m_id; //Id задачи
+    TaskId m_id; //Id задачи
 
     //---------------Работа с сообщениями---------------------------------------
     /**

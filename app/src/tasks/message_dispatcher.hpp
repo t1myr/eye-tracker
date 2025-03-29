@@ -7,6 +7,8 @@
 
 #include "logging/logger.hpp"
 
+using TaskId = uint32_t;
+
 /// @brief Пустое тело сообщения с виртуальным деструктором
 struct MessageBody
 {   
@@ -16,8 +18,8 @@ struct MessageBody
 /// @brief Сообщение для межпоточного взаимодействия
 struct Message
 {
-    uint32_t src;
-    uint32_t dst;
+    TaskId src;
+    TaskId dst;
     std::unique_ptr<MessageBody> body;
 };
 
@@ -30,16 +32,16 @@ class MessageDispatcher
 public:
     /**
      * @brief Добавляем задачу
-     * @param uint32_t id задачи
+     * @param TaskId id задачи
      * @param t задача
      */
-    void regTask(uint32_t id, Task* t) noexcept;
+    void regTask(TaskId id, Task* t) noexcept;
 
     /**
      * @brief Убираем задачу из диспетчера
-     * @param uint32_t id задачи
+     * @param TaskId id задачи
      */
-    void unregTask(uint32_t id) noexcept;
+    void unregTask(TaskId id) noexcept;
     
     /**
      * @brief Получаем экземпляр диспетчера
@@ -54,7 +56,7 @@ public:
 
 private:
     static std::shared_ptr<MessageDispatcher> m_instance;
-    std::unordered_map<uint32_t, Task*> tasks;
+    std::unordered_map<TaskId, Task*> tasks;
 };
 
 #endif //_MESSAGE_DISPATCHER_HPP

@@ -6,14 +6,14 @@
  * @param taskId id задачи
  * @param t задача
  */
-void MessageDispatcher::regTask(uint32_t taskId, Task* t) noexcept
+void MessageDispatcher::regTask(TaskId taskId, Task* t) noexcept
 {
     if(tasks.contains(taskId))
     {
         spdlog::error("Dispatcher already contains task {}", t->getName());
         return;
     }
-    spdlog::info("Dispatcher add task {} with id={}", t->getName(), t->m_id);
+    spdlog::debug("Dispatcher add task {} with id={}", t->getName(), t->m_id);
     tasks[taskId] = t;
 }
 
@@ -21,14 +21,14 @@ void MessageDispatcher::regTask(uint32_t taskId, Task* t) noexcept
  * @brief Убираем задачу из диспетчера
  * @param taskId id задачи
  */
-void MessageDispatcher::unregTask(uint32_t taskId) noexcept
+void MessageDispatcher::unregTask(TaskId taskId) noexcept
 {
     if(!tasks.contains(taskId))
     {
         spdlog::error("Dispatcher doesnt have task with id={}, nothing to delete", taskId);
         return;
     }
-    spdlog::info("Dispatcher delete task with id={}", taskId);
+    spdlog::debug("Dispatcher delete task with id={}", taskId);
     tasks.erase(taskId);
 }
 
