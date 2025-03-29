@@ -6,26 +6,15 @@
 
 ///base
 #include "tasks/task.hpp"
+#include "predictors/face_shape_predictor.hpp"
 
 
 /// @brief Класс, осуществляющий захват видео кадра и его отрисовку
 class VideoCapture : public Task
 {
 public:
-
-    struct CurFrameInfo : MessageBody
-    {
-        CurFrameInfo(std::unique_ptr<cv::Mat>&& _curFrame) : 
-                            MessageBody(), 
-                            curFrame(std::move(_curFrame)) 
-                            {}
-
-        std::unique_ptr<cv::Mat> curFrame;
-    };
-
-
     /// @brief Конструктор
-    VideoCapture();
+    VideoCapture(const std::string& shapePredictorPath);
 
 private:
 
@@ -39,7 +28,10 @@ private:
      * @brief Принимаем сообщение от другой задачи
      * @param msg сообщение
      */
-    void receiveMessage(Message &&msg) noexcept override;
+    void receiveMessage(Message &&msg) noexcept override {}
+
+    //---------------Поиск лица-------------------------------------------------
+    FaceShapePredictor m_facePredictor;
 
     //---------------Работа с отрисовкой кадра----------------------------------
     cv::Mat m_curFrame;
@@ -48,6 +40,9 @@ private:
     int m_deviceId; //Id камеры
     cv::VideoCaptureAPIs m_apiId; //Id используемого API
     cv::VideoCapture m_cap;
+
+    //---------------Работа с другими задачами----------------------------------
+    ///empty now
 };
 
 #endif //_VIDEO_CAPTURE_HPP_
