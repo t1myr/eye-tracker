@@ -20,6 +20,11 @@ public:
     ThreadPool(ThreadPool&&) = delete;
     ThreadPool& operator=(const ThreadPool&) = delete;
     ThreadPool& operator=(ThreadPool&&) = delete;
+
+    /**
+     * @brief Деструктор
+     */
+    ~ThreadPool();
     
     /**
      * @brief Инициализация пула
@@ -52,7 +57,7 @@ public:
      * @return std::vector<std::future<void>> 
      */
     template<typename F, typename... Args>
-    auto ThreadPool::enqueueAcquire(std::vector<std::function<void()>> tasks) -> std::vector<std::future<void>>;
+    auto enqueueAcquire(std::vector<std::function<void()>> tasks) -> std::vector<std::future<void>>;
 
     /**
      * @brief Выдача количества свободных исполнителей
@@ -76,11 +81,6 @@ private:
      * @param numThreads Количество потоков в пуле
      */
     ThreadPool(std::size_t numThreads);
-
-    /**
-     * @brief Деструктор
-     */
-    ~ThreadPool();
 };
     
 template<typename F, typename... Args>
@@ -114,7 +114,7 @@ auto ThreadPool::enqueueAcquire(std::vector<std::function<void()>> tasks) -> std
 
         // Ждём, пока освободится нужное количество потоков
         m_condition.wait(lock, [this, numThreads] {
-            return m_workers.size() - m_busyWorkers >= tasks.size();
+            return m_workers.size() - m_busyWorkers >= numThreads;
         });
 
         // "Бронируем" потоки

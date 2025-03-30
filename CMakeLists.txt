@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.20)
-message(STATUS "VCPKG_ROOT is set to $ENV{VCPKG_ROOT}")
+
 project(cmake_eye_tracker VERSION 1.0 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 23)

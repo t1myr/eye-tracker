@@ -4,6 +4,7 @@
 #include "logging/logger.hpp"
 ///tasks
 #include "video_capture.hpp"
+#include "tasks/thread_pool.hpp"
 
 
 int main(int argc, char* argv[])
@@ -11,6 +12,7 @@ int main(int argc, char* argv[])
     //Инициализация логгирования
     Logger::init(spdlog::level::debug);
     Logger::set_thread_name("main");
+    ThreadPool::init(8);
 
     spdlog::info("Starting the program");
     //Инициализируем задачи

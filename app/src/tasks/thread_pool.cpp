@@ -6,14 +6,23 @@
 std::unique_ptr<ThreadPool> ThreadPool::m_instance = nullptr;
 
 /**
+ * @brief Деструктор
+ */
+ThreadPool::~ThreadPool() {
+    m_stop = true;
+    m_condition.notify_all();
+    for (std::thread& worker : m_workers)
+        worker.join();
+}
+
+/**
  * @brief Инициализация пула
  * @param numThreads 
  */
 void ThreadPool::init(std::size_t numThreads)
 {
-
     if(!m_instance)
-        m_instance = std::make_unique<ThreadPool>(numThreads);
+        m_instance.reset(new ThreadPool(numThreads));
 }
 
 /**
@@ -61,14 +70,4 @@ ThreadPool::ThreadPool(size_t numThreads) : m_stop(false), m_busyWorkers(0) {
             }
         });
     }
-}
-
-/**
- * @brief Деструктор
- */
-ThreadPool::~ThreadPool() {
-    m_stop = true;
-    m_condition.notify_all();
-    for (std::thread& worker : m_workers)
-        worker.join();
 }
