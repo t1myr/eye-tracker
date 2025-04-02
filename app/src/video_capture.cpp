@@ -56,14 +56,49 @@ void VideoCapture::mainFunc()
     // Если лицо найдено, рисуем точки на кадре
     if (faceShape)
     {
-        for (int i = 0; i < faceShape->num_parts(); ++i)
-        {
-            const auto& p = faceShape->part(i);
-            cv::circle(m_curFrame, cv::Point(p.x(), p.y()), 2, cv::Scalar(0, 255, 0), -1);
-        }
+        drawFaceMask(*faceShape);
+        drawEyeBoundingBox(*faceShape);
     }
 
     //Рендерим картинку
     cv::imshow("Camera", m_curFrame);
     cv::waitKey(1);
+}
+
+//==================================================================================================
+//---------------Работа с отрисовкой кадра----------------------------------------------------------
+//==================================================================================================
+/**
+ * @brief Рисуем маску лица
+ * @param faceShape маска лица
+ */
+void VideoCapture::drawFaceMask(const dlib::full_object_detection& faceShape) const noexcept
+{
+    for (int i = 0; i < faceShape.num_parts(); ++i)
+    {
+        cv::Scalar color;
+        const auto& p = faceShape.part(i);
+        if(FaceShapePredictor::kLeftEyeStartPoint <= i && i <= FaceShapePredictor::kLeftEyeEndPoint)
+        {
+            color = cv::Scalar(240, 255, 255);
+        }else if(FaceShapePredictor::kLeftEyeStartPoint <= i && i <= FaceShapePredictor::kRightEyeEndPoint)
+        {
+            color = cv::Scalar(242, 44, 54);
+        }else
+        {
+            color = cv::Scalar(0, 255, 0);
+        }
+
+        cv::circle(m_curFrame, cv::Point(p.x(), p.y()), 2, color, -1);
+    }
+}
+
+/**
+ * @brief Рисуем ограничивающие прямоугольники для глаз
+ * @param faceShape маска лица
+ */
+void VideoCapture::drawEyeBoundingBox(const dlib::full_object_detection& faceShape) const noexcept
+{
+    cv::rectangle(m_curFrame, m_facePredictor.getLeftEyeBoundingRect(faceShape), cv::Scalar(255, 0, 0), 2);
+    cv::rectangle(m_curFrame, m_facePredictor.getRightEyeBoundingRect(faceShape), cv::Scalar(255, 0, 0), 2);
 }

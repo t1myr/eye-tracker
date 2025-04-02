@@ -34,6 +34,17 @@ private:
     FaceShapePredictor m_facePredictor;
 
     //---------------Работа с отрисовкой кадра----------------------------------
+    /**
+     * @brief Рисуем маску лица
+     * @param faceShape маска лица
+     */
+    void drawFaceMask(const dlib::full_object_detection& faceShape) const noexcept;
+    /**
+     * @brief Рисуем ограничивающие прямоугольники для глаз
+     * @param faceShape маска лица
+     */
+    void drawEyeBoundingBox(const dlib::full_object_detection& faceShape) const noexcept;
+
     cv::Mat m_curFrame;
 
     //---------------Работа с камерой-------------------------------------------
