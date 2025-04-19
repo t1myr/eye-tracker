@@ -43,6 +43,12 @@ public:
      * @return cv::Rect ограничивающий прямоугольник
      */
     cv::Rect getRightEyeBoundingRect(const dlib::full_object_detection& shape) const noexcept;
+
+    /**
+     * @brief Получаем референсные точки для лица
+     * @return std::vector<cv::Point2f> 
+     */
+    std::vector<cv::Point2f> getRefFacePoints() const;
 private:
     /**
      * @brief Получаем главное лицо на картинке
@@ -63,7 +69,8 @@ private:
 
 
     dlib::shape_predictor m_sp; //68 точек 
-    dlib::frontal_face_detector m_detector;
+    dlib::frontal_face_detector m_detector; //детектор лица
+    std::optional<dlib::full_object_detection> m_curDetection;
 };
 
 #endif //_FACE_SHAPE_PREDICTOR_HPP_

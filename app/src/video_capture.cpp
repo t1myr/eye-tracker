@@ -1,7 +1,10 @@
 #include "video_capture.hpp"
 #include "spdlog/spdlog.h"
+
+//cv
 #include "opencv2/imgproc.hpp"
 #include "opencv2/highgui.hpp"
+#include "opencv2/calib3d.hpp"
 #include "dlib/opencv.h"
 
 
@@ -26,6 +29,8 @@ VideoCapture::VideoCapture(const std::string& shapePredictorPath) :
         //Попробовать другую камеру
         spdlog::warn("Cannot open device id={}, api={}, try next", m_deviceId, static_cast<int>(m_apiId));
     }
+    //Получаем параметры для калибровки камеры
+    m_calibrator = std::make_unique<CameraCalibrator>(m_cap);
 }
 
 //==================================================================================================
@@ -59,6 +64,15 @@ void VideoCapture::mainFunc()
         drawFaceMask(*faceShape);
         drawEyeBoundingBox(*faceShape);
     }
+
+    cv::Mat rvec, tvec;
+
+    // //Вычисляем позу лица
+    // bool success = cv::solvePnP(
+    //     m_3dmodelPoints, m_facePredictor.getRefFacePoints(),
+    //     m_calibrator.getCameraMatrix(), m_calibrator.getDistCoeffs(),
+    //     rvec, tvec
+    // );
 
     //Рендерим картинку
     cv::imshow("Camera", m_curFrame);

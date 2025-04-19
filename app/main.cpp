@@ -10,7 +10,7 @@
 int main(int argc, char* argv[])
 {
     //Инициализация логгирования
-    Logger::init(spdlog::level::debug);
+    Logger::init(spdlog::level::trace);
     Logger::set_thread_name("main");
     ThreadPool::init(8);
 

@@ -26,14 +26,16 @@ std::optional<dlib::full_object_detection> FaceShapePredictor::getFaceShape(
                                                         const dlib::array2d<dlib::rgb_pixel>& img)
 {
     auto detectedImgsShapes = m_detector(img);
+    //Сбрасываем текущее лицо
+    m_curDetection.reset();
     if(detectedImgsShapes.size() == 1)
         //Нашли одно лицо - возвращаем
-        return m_sp(img, detectedImgsShapes.front());
+        m_curDetection = m_sp(img, detectedImgsShapes.front());
     else if(detectedImgsShapes.size() > 1)
         //Если нашли больше, чем одно
-        return m_sp(img, getPrimaryFaceRect(img, detectedImgsShapes));
+        m_curDetection = m_sp(img, getPrimaryFaceRect(img, detectedImgsShapes));
     //Не нашли ничего
-    return {};
+    return m_curDetection;
 }
 
 /**
@@ -54,6 +56,25 @@ cv::Rect FaceShapePredictor::getLeftEyeBoundingRect(const dlib::full_object_dete
 cv::Rect FaceShapePredictor::getRightEyeBoundingRect(const dlib::full_object_detection& shape) const noexcept
 {
     return getEyeBoundingRect(shape, kRightEyeStartPoint, kRightEyeEndPoint);
+}
+
+/**
+ * @brief Получаем референсные точки для лица
+ * @return std::vector<cv::Point2f> 
+ */
+std::vector<cv::Point2f> FaceShapePredictor::getRefFacePoints() const
+{
+    if(!m_curDetection.has_value())
+        throw std::logic_error("Currrent detection must be valid");
+
+    return {
+        cv::Point2f(m_curDetection->part(30).x(), m_curDetection->part(30).y()), // Нос
+        cv::Point2f(m_curDetection->part(8).x(),  m_curDetection->part(8).y()),  // Подбородок
+        cv::Point2f(m_curDetection->part(36).x(), m_curDetection->part(36).y()), // Левый глаз
+        cv::Point2f(m_curDetection->part(45).x(), m_curDetection->part(45).y()), // Правый глаз
+        cv::Point2f(m_curDetection->part(48).x(), m_curDetection->part(48).y()), // Левая часть рта
+        cv::Point2f(m_curDetection->part(54).x(), m_curDetection->part(54).y())  // Правая часть рта
+    };
 }
 
 /**
