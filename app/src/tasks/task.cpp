@@ -189,6 +189,8 @@ void Task::threadFunc(Task* t)
     //установили имя потока
     Logger::set_thread_name(t->m_name);
 
+    t->init();
+
     //запустили основную функцию
     while (t->m_state >= State::Suspend) {
         {

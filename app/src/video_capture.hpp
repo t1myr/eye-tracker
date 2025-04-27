@@ -11,6 +11,9 @@
 //calibrate
 #include "camera_calibrator.hpp"
 
+//gaze vector
+#include "predictors/eye_gaze_tracker.hpp"
+
 /// @brief Класс, осуществляющий захват видео кадра и его отрисовку
 class VideoCapture : public Task
 {
@@ -27,6 +30,11 @@ private:
     void mainFunc() override;
 
     /**
+     * @brief Инициализация
+     */
+    void init() override;
+
+    /**
      * @brief Принимаем сообщение от другой задачи
      * @param msg сообщение
      */
@@ -34,6 +42,9 @@ private:
 
     //---------------Поиск лица-------------------------------------------------
     FaceShapePredictor m_facePredictor;
+
+    //---------------Поиск лица-------------------------------------------------
+    EyeGazeTracker m_gazeTracker{};
 
     //---------------Работа с отрисовкой кадра----------------------------------
     /**

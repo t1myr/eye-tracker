@@ -29,8 +29,6 @@ VideoCapture::VideoCapture(const std::string& shapePredictorPath) :
         //Попробовать другую камеру
         spdlog::warn("Cannot open device id={}, api={}, try next", m_deviceId, static_cast<int>(m_apiId));
     }
-    //Получаем параметры для калибровки камеры
-    m_calibrator = std::make_unique<CameraCalibrator>(m_cap);
 }
 
 //==================================================================================================
@@ -41,8 +39,12 @@ VideoCapture::VideoCapture(const std::string& shapePredictorPath) :
  */
 void VideoCapture::mainFunc()
 {
-    if(!m_cap.isOpened())
-        return;
+    auto renderFrame = [this]()
+    {
+        //Рендерим картинку
+        cv::imshow("Camera", m_curFrame);
+        cv::waitKey(1);
+    };
 
     m_cap.read(m_curFrame);
 
@@ -63,20 +65,48 @@ void VideoCapture::mainFunc()
     {
         drawFaceMask(*faceShape);
         drawEyeBoundingBox(*faceShape);
+    }else
+    {
+        renderFrame();
+        return;
+    }
+    cv::Vec3d rvec, tvec;
+
+    //Вычисляем позу лица
+    bool success = cv::solvePnP(
+        m_3dmodelPoints, m_facePredictor.getRefFacePoints(),
+        m_calibrator->getCameraMatrix(), m_calibrator->getDistCoeffs(),
+        rvec, tvec
+    );
+
+    if(!success)
+    {
+        spdlog::warn("Head pose estimation failed");
+        renderFrame();
     }
 
-    cv::Mat rvec, tvec;
+    cv::Matx33d rotationMatrix;
+    cv::Rodrigues(rvec, rotationMatrix);
 
-    // //Вычисляем позу лица
-    // bool success = cv::solvePnP(
-    //     m_3dmodelPoints, m_facePredictor.getRefFacePoints(),
-    //     m_calibrator.getCameraMatrix(), m_calibrator.getDistCoeffs(),
-    //     rvec, tvec
-    // );
+    m_gazeTracker.setHeadPose(rotationMatrix, tvec);
 
-    //Рендерим картинку
-    cv::imshow("Camera", m_curFrame);
-    cv::waitKey(1);
+    m_gazeTracker.update(*faceShape, m_curFrame);
+
+    if(m_gazeTracker.getGlobalGazeVector().has_value())
+    {
+        spdlog::info("Calculated gaze vector!!!!");
+    }
+
+    renderFrame();
+}
+
+/**
+ * @brief Инициализация
+ */
+void VideoCapture::init()
+{
+    //Получаем параметры для калибровки камеры
+    m_calibrator = std::make_unique<CameraCalibrator>(m_cap);
 }
 
 //==================================================================================================
