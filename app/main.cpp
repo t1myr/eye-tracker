@@ -3,21 +3,30 @@
 ///logging
 #include "logging/logger.hpp"
 ///tasks
-#include "video_capture.hpp"
+#include "control_task.hpp"
+#include "virtual_scene_task.hpp"
 #include "tasks/thread_pool.hpp"
+
+
+static constexpr std::size_t kMaxThreadPoolSize = 8;
 
 
 int main(int argc, char* argv[])
 {
     //Инициализация логгирования
-    Logger::init(spdlog::level::trace);
+    Logger::init(spdlog::level::info);
     Logger::set_thread_name("main");
-    ThreadPool::init(8);
+    ThreadPool::init(kMaxThreadPoolSize);
 
     spdlog::info("Starting the program");
     //Инициализируем задачи
-    VideoCapture capture("C:\\Users\\timur\\Projects\\eye-tracker\\data\\shape_predictor_68_face_landmarks.dat");
-    capture.start();
+    ControlTask ctrl("C:\\Users\\timur\\Projects\\eye-tracker\\data\\shape_predictor_68_face_landmarks.dat");
+    VirtualScene scene;
+    ctrl.setVirtualScene(&scene);
+    scene.setCtrl(&ctrl);
+
+    ctrl.start();
+    scene.start();
     
     while(true)
     {

@@ -21,6 +21,7 @@ public:
     static constexpr std::size_t kLeftEyeEndPoint = 41;
     static constexpr std::size_t kRightEyeStartPoint = 42;
     static constexpr std::size_t kRightEyeEndPoint = 47;
+    static const std::array<cv::Point3f, 6> kVirtualModelPoints;
 
     /// @brief Конструктор
     FaceShapePredictor(const std::string& filePath) noexcept;
@@ -28,9 +29,9 @@ public:
     //---------------Определение объектов на изображении------------------------
     /**
      * @brief Получаем точки лица
-     * @param img изображение
+     * @param frame кадр изображения
      */
-    std::optional<dlib::full_object_detection> getFaceShape(const dlib::array2d<dlib::rgb_pixel>& img);
+    std::optional<dlib::full_object_detection> getFaceShape(const cv::Mat& frame);
     /**
      * @brief Получаем ограничивающий прямоугольник для левого глаза
      * @param shape точки лица

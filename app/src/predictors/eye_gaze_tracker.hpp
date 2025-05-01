@@ -1,34 +1,47 @@
 #ifndef _EYE_GAZE_TRACKER_HPP_
 #define _EYE_GAZE_TRACKER_HPP_
 
+//base
 #include "opencv2/core.hpp"
 #include "dlib/image_processing.h"
+
+//calibration
+#include "../calibration/camera_calibrator.hpp"
+
 
 /// @brief Трекер глаза
 class EyeGazeTracker 
 {
 public:
     /// @brief Конструктор
-    EyeGazeTracker();
+    EyeGazeTracker(std::shared_ptr<CameraCalibrator> calibrator);
 
-    /// @brief Установить матрицу вращения и вектор трансляции от Head Pose Estimation
-    void setHeadPose(const cv::Matx33d& rotation, const cv::Vec3d& translation);
+    /// @brief Вычисляем позу лица
+    bool estimateHeadPose(const std::vector<cv::Point2f>& refPoints);
 
     /// @brief Обновить трекер новым лицом и кадром
     void update(const dlib::full_object_detection& faceShape, const cv::Mat& frame);
 
+    /// @brief Трекер готов к выдаче результатов
+    bool ready() const { return m_hasPose && m_hasVector; }
+
     ///@brief  Получить глобальный вектор 
-    std::optional<cv::Vec3d> getGlobalGazeVector() const;
+    cv::Vec3d getGlobalGazeVector() const;
 
     /// @brief Центры зрачков
     std::optional<cv::Point2f> getLastPupilCenterLeft() const;
     std::optional<cv::Point2f> getLastPupilCenterRight() const;
 
 private:
-    cv::Matx33d rotationMatrix_;
-    cv::Vec3d translationVector_;
-    bool hasPose_ = false;
+    //---------------Калибровка-------------------------------------------------
+    std::shared_ptr<CameraCalibrator> m_calibrator;
 
+    //---------------Поза головы------------------------------------------------
+    cv::Matx33d m_rotationMatrix;
+    cv::Vec3d m_translationVector;
+    bool m_hasPose{false};
+
+    //---------------Вектор взгляда---------------------------------------------
     std::optional<cv::Vec3d> m_localGazeLeft;
     std::optional<cv::Vec3d> m_globalGazeLeft;
     std::optional<cv::Vec3d> m_localGazeRight;
@@ -37,6 +50,11 @@ private:
     std::optional<cv::Point2f> m_pupilCenterLeft;
     std::optional<cv::Point2f> m_pupilCenterRight;
 
+    bool m_hasVector{false};
+
+    /// @brief Получаем ROI глаз
+    std::pair<cv::Rect, cv::Rect> extractEyeROIs(const dlib::full_object_detection& shape, const cv::Mat& image);
+    /// @brief Обновляем один глаз
     void updateSingleEye(
         const cv::Mat& frame,
         const cv::Rect& roi,
@@ -44,8 +62,6 @@ private:
         std::optional<cv::Vec3d>& globalGaze,
         std::optional<cv::Point2f>& pupilCenter
     );
-    /// @brief Получаем из формы регионы с глазами
-    std::pair<cv::Rect, cv::Rect> extractEyeROIs(const dlib::full_object_detection& shape, const cv::Mat& image);
     /// @brief Обработка одного глаза
     std::optional<std::pair<cv::Vec3d, cv::Point2f>> processEye(const cv::Mat& eyeROI);
 };

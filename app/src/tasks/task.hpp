@@ -74,7 +74,8 @@ protected:
      * @brief Принимаем сообщение от другой задачи
      * @param msg сообщение
      */
-    virtual void receiveMessage(Message &&msg) noexcept = 0;
+    virtual void receiveMessage(Message &&msg) 
+    { throw std::invalid_argument(std::format("Receive message with src={}, dst={}", msg.src, msg.dst)); }
 
     //---------------Работа с таймерами-----------------------------------------
     /**

@@ -6,12 +6,11 @@
  * @param taskId id задачи
  * @param t задача
  */
-void MessageDispatcher::regTask(TaskId taskId, Task* t) noexcept
+void MessageDispatcher::regTask(TaskId taskId, Task* t)
 {
     if(tasks.contains(taskId))
     {
-        spdlog::error("Dispatcher already contains task {}", t->getName());
-        return;
+        throw std::runtime_error(std::format("Dispatcher already contains task {}", t->getName()));
     }
     spdlog::debug("Dispatcher add task {} with id={}", t->getName(), t->m_id);
     tasks[taskId] = t;
@@ -21,12 +20,11 @@ void MessageDispatcher::regTask(TaskId taskId, Task* t) noexcept
  * @brief Убираем задачу из диспетчера
  * @param taskId id задачи
  */
-void MessageDispatcher::unregTask(TaskId taskId) noexcept
+void MessageDispatcher::unregTask(TaskId taskId)
 {
     if(!tasks.contains(taskId))
     {
-        spdlog::error("Dispatcher doesnt have task with id={}, nothing to delete", taskId);
-        return;
+        throw std::runtime_error(std::format("Dispatcher doesnt have task with id={}, nothing to delete", taskId));
     }
     spdlog::debug("Dispatcher delete task with id={}", taskId);
     tasks.erase(taskId);
@@ -48,7 +46,7 @@ std::shared_ptr<MessageDispatcher> MessageDispatcher::get()
  * @brief Добавляем сообщение в очередь задачи
  * @param msg сообщение
  */
-void MessageDispatcher::pollMessage(Message&& msg) const noexcept
+void MessageDispatcher::pollMessage(Message&& msg) const
 {
     if(tasks.contains(msg.dst))
     {
@@ -56,7 +54,7 @@ void MessageDispatcher::pollMessage(Message&& msg) const noexcept
         tasks.at(msg.dst)->messageQueue.q.push(std::move(msg));
     }else
     {
-        spdlog::error("Event dispatcher doesnt have task with id={}", msg.dst);
+        throw std::runtime_error(std::format("Event dispatcher doesnt have task with id={}", msg.dst));
     }
 }
 

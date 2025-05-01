@@ -1,9 +1,0 @@
-{
-  "dependencies": [
-    "dlib",
-    "spdlog",
-    "gtest",
-    "opencv",
-    "lapack"
-  ]
-}

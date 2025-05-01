@@ -1,8 +1,8 @@
 #ifndef _CAMERA_CALIBRATOR_HPP_
 #define _CAMERA_CALIBRATOR_HPP_
 
-///video
-#include "opencv2/videoio.hpp"
+//frame capturing
+#include "frame_capture_entity/frame_capture_entity.hpp"
 
 /**
  * @brief Класс для калибровки камеры по шахматной доске
@@ -11,10 +11,12 @@ class CameraCalibrator
 {
 public:
     inline static const std::string kCalibDataDefaultPath = "C:/Users/timur/calibrationData.xml";
-    ///Конструктор по умолчанию
-    CameraCalibrator(cv::VideoCapture& cap);
-    ///Конструктор, сохраняющий путь к калибровочным данным
-    CameraCalibrator(cv::VideoCapture& cap, const std::string& path);
+
+    /// @brief Конструктор, сохраняющий путь к калибровочным данным
+    CameraCalibrator(std::shared_ptr<FrameCaptureEntity>& cap, const std::string& path);
+
+    /// @brief Конструктор с захватом
+    CameraCalibrator(std::shared_ptr<FrameCaptureEntity>& cap);
 
     /// Выполнить калибровку камеры
     bool calibrate();
@@ -36,8 +38,8 @@ private:
     cv::Mat m_distCoeffs;
     bool m_calibrated = false;
     //Video capture
-    cv::VideoCapture& m_cap;
     std::string m_filePath;
+    std::shared_ptr<FrameCaptureEntity> m_cap;
 
     // Настройки шахматной доски
     cv::Size m_boardSize = {7, 7};

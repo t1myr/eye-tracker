@@ -1,5 +1,18 @@
 #include "face_shape_predictor.hpp"
 
+// To opencv
+#include "dlib/opencv.h"
+
+
+const std::array<cv::Point3f, 6> FaceShapePredictor::kVirtualModelPoints = {
+    cv::Point3f{0.0f, 0.0f, 0.0f},         // Нос 
+    cv::Point3f{0.0f, -330.0f, -65.0f},    // Подбородок
+    cv::Point3f{-225.0f, 170.0f, -135.0f}, // Левый угол глаза
+    cv::Point3f{225.0f, 170.0f, -135.0f},  // Правый угол глаза
+    cv::Point3f{-150.0f, -150.0f, -125.0f},// Левый угол рта
+    cv::Point3f{150.0f, -150.0f, -125.0f}  // Правый угол рта
+};
+
 
 //==================================================================================================
 //---------------SHAPE PREDICTOR--------------------------------------------------------------------
@@ -18,13 +31,14 @@ FaceShapePredictor::FaceShapePredictor(const std::string& filePath) noexcept
 //---------------Определение объектов на изображении------------------------------------------------
 //==================================================================================================
 /**
- * @brief Получаем точки лица 
- * @param img картинка с лицом
- * @return dlib::full_object_detection 
+ * @brief Получаем точки лица
+ * @param frame кадр изображения
  */
-std::optional<dlib::full_object_detection> FaceShapePredictor::getFaceShape(
-                                                        const dlib::array2d<dlib::rgb_pixel>& img)
+std::optional<dlib::full_object_detection> FaceShapePredictor::getFaceShape(const cv::Mat& frame)
 {
+    dlib::array2d<dlib::rgb_pixel> img;
+    dlib::assign_image(img, dlib::cv_image<dlib::rgb_pixel>(frame));
+
     auto detectedImgsShapes = m_detector(img);
     //Сбрасываем текущее лицо
     m_curDetection.reset();

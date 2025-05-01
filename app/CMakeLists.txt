@@ -12,7 +12,7 @@ find_package(spdlog CONFIG REQUIRED)
 include_directories(src)
 
 
-add_library(eye_tracker_lib SHARED STATIC ${HEADERS} ${SOURCES})
+add_library(eye_tracker_lib STATIC ${HEADERS} ${SOURCES})
 target_include_directories(eye_tracker_lib PUBLIC ${OpenCV_INCLUDE_DIRS})
 target_link_libraries(eye_tracker_lib ${OpenCV_LIBS} dlib::dlib spdlog::spdlog)
 

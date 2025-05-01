@@ -77,7 +77,6 @@ void Task::start()
             m_thread = std::thread(Task::threadFunc, this);
             //зарегистрировали задачу в диспетчере
             m_dispatcher->regTask(m_id, this);
-            spdlog::info("Task [{}, id={}] started", m_name, m_id);
         }
 
     }
@@ -188,7 +187,7 @@ void Task::threadFunc(Task* t)
 {
     //установили имя потока
     Logger::set_thread_name(t->m_name);
-
+    spdlog::info("Task [{}, id={}] started", t->m_name, t->m_id);
     t->init();
 
     //запустили основную функцию

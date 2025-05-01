@@ -3,7 +3,6 @@
 //cv
 #include "opencv2/imgproc.hpp"
 #include "opencv2/calib3d.hpp"
-#include "opencv2/videoio.hpp"
 #include "opencv2/highgui.hpp"
 
 //logging
@@ -11,29 +10,30 @@
 
 
 /**
- * @brief Конструктор по умолчанию
- */
-CameraCalibrator::CameraCalibrator(cv::VideoCapture& cap) : CameraCalibrator(cap, CameraCalibrator::kCalibDataDefaultPath)
-{
-
-}
-
-/**
  * @brief Конструктор, сохраняющий путь к калибровочным данным
  * @param path 
  */
-CameraCalibrator::CameraCalibrator(cv::VideoCapture& cap, const std::string& path) : 
+CameraCalibrator::CameraCalibrator(std::shared_ptr<FrameCaptureEntity>& cap, const std::string& path) : 
                                                                     m_filePath(path),
                                                                     m_cap(cap)
 {
     if (!load(m_filePath)) {
         spdlog::info("Calibration file not found or invalid. Starting calibration...");
         m_calibrated = calibrate();
-        spdlog::info("Calibration... done");
+        spdlog::info("Calibration... {}", m_calibrated ? "done" : "incomplete, errors occuried");
     } else {
         spdlog::info("Calibration parameters loaded from file: {}", path);
         m_calibrated = true;
     }
+}
+
+/**
+ * @brief Конструктор по умолчанию
+ */
+CameraCalibrator::CameraCalibrator(std::shared_ptr<FrameCaptureEntity>& cap) : 
+                            CameraCalibrator(cap, CameraCalibrator::kCalibDataDefaultPath)
+{
+
 }
 
 /**
@@ -46,8 +46,9 @@ bool CameraCalibrator::calibrate()
 
     int captured = 0;
     while (captured < 15) {
-        cv::Mat frame, gray;
-        m_cap >> frame;
+        cv::Mat gray;
+        cv::Mat frame = m_cap->nextFrame();
+
         if (frame.empty()) break;
 
         cv::cvtColor(frame, gray, cv::COLOR_BGR2GRAY);
@@ -103,7 +104,6 @@ const cv::Mat& CameraCalibrator::getCameraMatrix() const {
 }
 /**
  * @brief Получить коэффициенты дисторсии
- * 
  * @return const cv::Mat& 
  */
 const cv::Mat& CameraCalibrator::getDistCoeffs() const {

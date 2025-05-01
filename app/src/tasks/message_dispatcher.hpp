@@ -35,13 +35,13 @@ public:
      * @param TaskId id задачи
      * @param t задача
      */
-    void regTask(TaskId id, Task* t) noexcept;
+    void regTask(TaskId id, Task* t);
 
     /**
      * @brief Убираем задачу из диспетчера
      * @param TaskId id задачи
      */
-    void unregTask(TaskId id) noexcept;
+    void unregTask(TaskId id);
     
     /**
      * @brief Получаем экземпляр диспетчера
@@ -52,7 +52,7 @@ public:
      * @brief Добавляем сообщение в очередь задачи
      * @param msg сообщение
      */
-    void pollMessage(Message&& msg) const noexcept;
+    void pollMessage(Message&& msg) const;
 
 private:
     static std::shared_ptr<MessageDispatcher> m_instance;
