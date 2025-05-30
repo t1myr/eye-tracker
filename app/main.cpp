@@ -2,14 +2,20 @@
 #include "opencv2/highgui.hpp"
 ///logging
 #include "logging/logger.hpp"
+
 ///tasks
 #include "control_task.hpp"
-#include "virtual_scene_task.hpp"
+#include "virtual_scene/virtual_scene_task.hpp"
+#include "input_control/input_control_task.hpp"
+#include "mouse_control/mouse_control_task.hpp"
 #include "tasks/thread_pool.hpp"
 
 
-static constexpr std::size_t kMaxThreadPoolSize = 8;
+using namespace cv;
+using namespace std;
 
+static constexpr std::size_t kMaxThreadPoolSize = 8;
+// "C:\\Users\\timur\\Projects\\eye-tracker\\data\\calibrate"
 
 int main(int argc, char* argv[])
 {
@@ -17,21 +23,25 @@ int main(int argc, char* argv[])
     Logger::init(spdlog::level::info);
     Logger::set_thread_name("main");
     ThreadPool::init(kMaxThreadPoolSize);
-
     spdlog::info("Starting the program");
     //Инициализируем задачи
     ControlTask ctrl("C:\\Users\\timur\\Projects\\eye-tracker\\data\\shape_predictor_68_face_landmarks.dat");
     VirtualScene scene;
+    InputControlTask input;
+    MouseControlTask mouse(MouseControlTask::Mode::kVisual);
+
+    //Задаем взаимодействие между задачами
     ctrl.setVirtualScene(&scene);
     scene.setCtrl(&ctrl);
 
+    //Запускаем
     ctrl.start();
     scene.start();
+    input.start();
+    mouse.start();
     
     while(true)
-    {
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
-    }
 
     return 0;
 }

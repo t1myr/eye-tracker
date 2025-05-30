@@ -9,12 +9,16 @@ file(GLOB_RECURSE HEADERS CONFIGURE_DEPENDS  "src/*.hpp")
 find_package(OpenCV CONFIG REQUIRED)
 find_package(dlib CONFIG REQUIRED)
 find_package(spdlog CONFIG REQUIRED)
+find_package(glog CONFIG REQUIRED)
+find_package(cli CONFIG REQUIRED)
+find_package(argparse CONFIG REQUIRED)
 include_directories(src)
 
 
 add_library(eye_tracker_lib STATIC ${HEADERS} ${SOURCES})
 target_include_directories(eye_tracker_lib PUBLIC ${OpenCV_INCLUDE_DIRS})
-target_link_libraries(eye_tracker_lib ${OpenCV_LIBS} dlib::dlib spdlog::spdlog)
+target_link_libraries(eye_tracker_lib ${OpenCV_LIBS} dlib::dlib 
+                                            spdlog::spdlog glog::glog cli::cli argparse::argparse)
 
 set_target_properties(eye_tracker_lib PROPERTIES LINKER_LANGUAGE CXX)
 

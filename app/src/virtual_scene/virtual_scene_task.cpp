@@ -6,6 +6,9 @@
 
 #include "shared_messages/shared_message.hpp"
 
+//==================================================================================================
+//---------------VIRTUAL SCENE TASK-----------------------------------------------------------------
+//==================================================================================================
 /**
  * @brief Конструктор
  */
@@ -14,6 +17,10 @@ VirtualScene::VirtualScene() : Task("v_scene", MessageDispatcher::get())
 
 }
 
+/**
+ * @brief Обработка новой точки
+ * @param gazeVector 
+ */
 void VirtualScene::handleNewPoint(const cv::Vec3d& gazeVector)
 {
     if (!m_ready) {
@@ -25,13 +32,20 @@ void VirtualScene::handleNewPoint(const cv::Vec3d& gazeVector)
         }
         return;
     }
-
     // Сохраняем последний взгляд
     m_lastGaze = gazeVector;
     m_lastIntersection = intersectRayWithPlane(gazeVector);
-    
+    sendMessage({
+        .src = getId(), 
+        .dst = m_ctrl->getId(), 
+        .body = std::make_unique<FrameMessage>(getSceneFrame(getSceneData()))
+                });
 }
 
+/**
+ * @brief Получаем данные сцены
+ * @return VirtualScene::SceneData 
+ */
 VirtualScene::SceneData VirtualScene::getSceneData() const
 {
     SceneData data;
@@ -161,7 +175,6 @@ cv::Mat VirtualScene::getSceneFrame(const VirtualScene::SceneData& sceneData)
     const cv::Scalar cubeColor(0, 255, 0);
     const cv::Scalar gazeColor(255, 0, 0);
     const cv::Scalar intersectionColor(255, 255, 255);
-
     // Создаем черное изображение
     outputImage = cv::Mat(height, width, CV_8UC3, backgroundColor);
 
@@ -191,11 +204,9 @@ cv::Mat VirtualScene::getSceneFrame(const VirtualScene::SceneData& sceneData)
     cv::Point gazeStart = project(cv::Point3d(0,0,0));
     cv::Point gazeEnd = project(cv::Point3d(sceneData.gazeVector * 2.0)); // удлинён для наглядности
     cv::arrowedLine(outputImage, gazeStart, gazeEnd, gazeColor, 2);
-
     // Рисуем точку пересечения
     if (sceneData.lastIntersectionPoint) {
         cv::circle(outputImage, project(*sceneData.lastIntersectionPoint), 6, intersectionColor, cv::FILLED);
     }
-
     return outputImage;
 }

@@ -13,8 +13,8 @@ namespace utils
      */
     bool isImageFile(const fs::path& path)
     {
-        const std::string ext = path.extension().string();
-        const std::string lowercaseExt = utils::toLowerCopy(ext);
+        auto ext = path.extension().string();
+        auto lowercaseExt = utils::toLowerCopy(ext);
         return lowercaseExt == ".jpg" || lowercaseExt == ".jpeg" ||
                lowercaseExt == ".png" || lowercaseExt == ".bmp" ||
                lowercaseExt == ".tiff";

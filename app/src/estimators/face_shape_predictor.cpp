@@ -3,6 +3,10 @@
 // To opencv
 #include "dlib/opencv.h"
 
+#include "opencv2/opencv_modules.hpp"
+
+#include "logging/logger.hpp"
+
 
 const std::array<cv::Point3f, 6> FaceShapePredictor::kVirtualModelPoints = {
     cv::Point3f{0.0f, 0.0f, 0.0f},         // Нос 
@@ -31,10 +35,10 @@ FaceShapePredictor::FaceShapePredictor(const std::string& filePath) noexcept
 //---------------Определение объектов на изображении------------------------------------------------
 //==================================================================================================
 /**
- * @brief Получаем точки лица
+ * @brief Обновляем предиктор новым лицом
  * @param frame кадр изображения
  */
-std::optional<dlib::full_object_detection> FaceShapePredictor::getFaceShape(const cv::Mat& frame)
+bool FaceShapePredictor::updateFace(const cv::Mat& frame)
 {
     dlib::array2d<dlib::rgb_pixel> img;
     dlib::assign_image(img, dlib::cv_image<dlib::rgb_pixel>(frame));
@@ -43,33 +47,52 @@ std::optional<dlib::full_object_detection> FaceShapePredictor::getFaceShape(cons
     //Сбрасываем текущее лицо
     m_curDetection.reset();
     if(detectedImgsShapes.size() == 1)
+    {
         //Нашли одно лицо - возвращаем
         m_curDetection = m_sp(img, detectedImgsShapes.front());
-    else if(detectedImgsShapes.size() > 1)
+    }else if(detectedImgsShapes.size() > 1)
+    {
         //Если нашли больше, чем одно
         m_curDetection = m_sp(img, getPrimaryFaceRect(img, detectedImgsShapes));
+    }
     //Не нашли ничего
-    return m_curDetection;
+    return m_curDetection.has_value();
+}
+
+/**
+ * @brief Получаем выборку точек левого глаза
+ * @return std::vector<cv::Point2d> подвыборка точек
+ */
+std::vector<cv::Point2d> FaceShapePredictor::getLeftEyePoints() const noexcept
+{
+    return getEyePoints(kLeftEyeStartPoint, kLeftEyeEndPoint);
+}
+
+/**
+ * @brief Получаем выборку точек правого глаза
+ * @return std::vector<cv::Point2d> подвыборка точек
+ */
+std::vector<cv::Point2d> FaceShapePredictor::getRightEyePoints() const noexcept
+{
+    return getEyePoints(kRightEyeStartPoint, kRightEyeEndPoint);
 }
 
 /**
  * @brief Получаем ограничивающий прямоугольник для левого глаза
- * @param shape точки лица
  * @return cv::Rect ограничивающий прямоугольник
  */
-cv::Rect FaceShapePredictor::getLeftEyeBoundingRect(const dlib::full_object_detection& shape) const noexcept
+cv::Rect FaceShapePredictor::getLeftEyeBoundingRect() const noexcept
 {
-    return getEyeBoundingRect(shape, kLeftEyeStartPoint, kLeftEyeEndPoint);
+    return getEyeBoundingRect(kLeftEyeStartPoint, kLeftEyeEndPoint);
 }
 
 /**
  * @brief Получаем ограничивающий прямоугольник для правого глаза
- * @param shape точки лица
  * @return cv::Rect ограничивающий прямоугольник
  */
-cv::Rect FaceShapePredictor::getRightEyeBoundingRect(const dlib::full_object_detection& shape) const noexcept
+cv::Rect FaceShapePredictor::getRightEyeBoundingRect() const noexcept
 {
-    return getEyeBoundingRect(shape, kRightEyeStartPoint, kRightEyeEndPoint);
+    return getEyeBoundingRect(kRightEyeStartPoint, kRightEyeEndPoint);
 }
 
 /**
@@ -106,17 +129,28 @@ const dlib::rectangle& FaceShapePredictor::getPrimaryFaceRect(
 }
 
 /**
- * @brief Получаем ограничивающий прямоугольник для глаза по точкам face_shape_landmark
- * @param shape точки лица
- * @return cv::Rect ограничивающий прямоугольник
+ * @brief Получаем выборку точек глаз
+ * @return std::vector<cv::Point2d> подвыборка точек
  */
-cv::Rect FaceShapePredictor::getEyeBoundingRect(const dlib::full_object_detection& shape, 
-                                                std::size_t start, std::size_t end) const noexcept
+std::vector<cv::Point2d> FaceShapePredictor::getEyePoints(std::size_t start, std::size_t end) const noexcept
 {
-    std::vector<cv::Point> eyePoints;
+    if(!m_curDetection)
+        return {};
+    std::vector<cv::Point2d> eyePoints;
     for (auto i = start; i <= end; ++i)
     {
-        eyePoints.emplace_back(shape.part(i).x(), shape.part(i).y());
+        eyePoints.emplace_back(m_curDetection->part(i).x(), m_curDetection->part(i).y());
     }
-    return cv::boundingRect(eyePoints);
+    return eyePoints;
+}
+
+/**
+ * @brief Получаем ограничивающий прямоугольник для глаза по точкам face_shape_landmark
+ * @return cv::Rect ограничивающий прямоугольник
+ */
+cv::Rect FaceShapePredictor::getEyeBoundingRect(std::size_t start, std::size_t end) const noexcept
+{
+    if(!m_curDetection)
+        return cv::Rect();
+    return cv::boundingRect(getEyePoints(start, end));
 }

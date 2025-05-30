@@ -1,9 +1,8 @@
-#ifndef _VIDEO_CAPTURE_HPP_
-#define _VIDEO_CAPTURE_HPP_
+#ifndef _MAIN_TASK_HPP_
+#define _MAIN_TASK_HPP_
 
 ///base
 #include "tasks/task.hpp"
-#include "predictors/face_shape_predictor.hpp"
 
 ///frame capturing
 #include "frame_capture_entity/frame_capture_entity.hpp"
@@ -11,8 +10,8 @@
 //calibrate
 #include "calibration/camera_calibrator.hpp"
 
-//gaze vector
-#include "predictors/eye_gaze_tracker.hpp"
+//estimators
+#include "estimators/global_gaze_estimator.hpp"
 
 
 /// @brief Класс, осуществляющий захват видео кадра и его отрисовку
@@ -45,17 +44,12 @@ private:
      */
     void receiveMessage(Message &&msg) override;
 
-    //---------------Поиск лица-------------------------------------------------
-    FaceShapePredictor m_facePredictor;
+    //---------------Эстиматоры-------------------------------------------------
+    std::unique_ptr<GlobalGazeEstimator> m_globalGazeEstimator;
+    const std::string m_shapePredictorPath;
 
-    //---------------Трекер взгляда---------------------------------------------
-    std::unique_ptr<EyeGazeTracker> m_gazeTracker;
-
-    //---------------Трекер взгляда---------------------------------------------
+    //---------------Работа с задачами------------------------------------------
     Task* m_virtualScene{nullptr};
-
-    //---------------Работа с отрисовкой кадра----------------------------------
-    cv::Mat m_curFrame; //Текущий кадр
 
     /**
      * @brief Рисуем маску лица
@@ -78,9 +72,7 @@ private:
     //---------------Работа с камерой-------------------------------------------
     std::shared_ptr<FrameCaptureEntity> m_cap;
     std::shared_ptr<CameraCalibrator> m_calibrator; //Калибровка 
-
-    //---------------Работа с другими задачами----------------------------------
-    Task* virtualScene{nullptr};
+    cv::Mat m_curFrame; //Текущий кадр
 };
 
 #endif //_VIDEO_CAPTURE_HPP_

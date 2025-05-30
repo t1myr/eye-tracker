@@ -13,10 +13,10 @@ public:
     inline static const std::string kCalibDataDefaultPath = "C:/Users/timur/calibrationData.xml";
 
     /// @brief Конструктор, сохраняющий путь к калибровочным данным
-    CameraCalibrator(std::shared_ptr<FrameCaptureEntity>& cap, const std::string& path);
+    CameraCalibrator(const std::shared_ptr<FrameCaptureEntity>& cap, const std::string& path);
 
     /// @brief Конструктор с захватом
-    CameraCalibrator(std::shared_ptr<FrameCaptureEntity>& cap);
+    CameraCalibrator(const std::shared_ptr<FrameCaptureEntity>& cap);
 
     /// Выполнить калибровку камеры
     bool calibrate();

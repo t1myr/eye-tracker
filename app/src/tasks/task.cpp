@@ -12,7 +12,8 @@
  */
 Task::Task(const std::string& name, std::shared_ptr<MessageDispatcher> disp) : m_name(name), m_dispatcher(disp)
 {
-    static std::atomic<uint32_t> idCounter = 0;
+    //Id начинается с 1. Нулевое зарезервировано как универсальное на усмотрение имплементации
+    static std::atomic<uint32_t> idCounter = 1;
     m_id = idCounter++;
     spdlog::info("Task [{}, id={}] created", m_name, m_id);
 }
@@ -224,7 +225,7 @@ void Task::threadFunc(Task* t)
         //Обрабатываем сообщения
         t->handleTemporaryQueue(tempQueue);
         ///Спим 10 мс
-        std::this_thread::sleep_for(std::chrono::milliseconds(5));
+        std::this_thread::sleep_for(std::chrono::milliseconds(1));
     }
 }
 
@@ -246,7 +247,7 @@ void Task::handleTemporaryQueue(std::queue<Message>& queue) noexcept
             receiveMessage(std::move(queue.front()));    
         }catch(const std::exception& exc)
         {
-            spdlog::critical("Uncatched exception occuried during work"
+            spdlog::critical("Uncatched exception occuried during work "
                                                 "on message : {}", exc.what());
         }
         queue.pop();

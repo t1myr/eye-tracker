@@ -1,6 +1,7 @@
 #include "string.hpp"
 
 #include <algorithm>
+#include <iterator>
 
 
 namespace utils
@@ -9,7 +10,7 @@ namespace utils
     std::string toLowerCopy(const std::string& str)
     {
         std::string res;
-        std::transform(str.begin(), str.end(), res.begin(),
+        std::transform(str.begin(), str.end(), std::back_inserter(res),
                     [](unsigned char c) { return std::tolower(c); });
         return res;
     }

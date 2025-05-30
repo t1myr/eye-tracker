@@ -28,22 +28,39 @@ public:
 
     //---------------Определение объектов на изображении------------------------
     /**
-     * @brief Получаем точки лица
+     * @brief Обновляем предиктор новым лицом
      * @param frame кадр изображения
      */
-    std::optional<dlib::full_object_detection> getFaceShape(const cv::Mat& frame);
+    bool updateFace(const cv::Mat& frame);
+
+    /**
+     * @brief Получаем точки лица
+     */
+    std::optional<dlib::full_object_detection> getFaceShape() const
+    { return m_curDetection; }
+
+    /**
+     * @brief Получаем выборку точек левого глаза
+     * @return std::vector<cv::Point2d> подвыборка точек
+     */
+    std::vector<cv::Point2d> getLeftEyePoints() const noexcept;
+
+    /**
+     * @brief Получаем выборку точек правого глаза
+     * @return std::vector<cv::Point2d> подвыборка точек
+     */
+    std::vector<cv::Point2d> getRightEyePoints() const noexcept;
+
     /**
      * @brief Получаем ограничивающий прямоугольник для левого глаза
-     * @param shape точки лица
      * @return cv::Rect ограничивающий прямоугольник
      */
-    cv::Rect getLeftEyeBoundingRect(const dlib::full_object_detection& shape) const noexcept;
+    cv::Rect getLeftEyeBoundingRect() const noexcept;
     /**
      * @brief Получаем ограничивающий прямоугольник для правого глаза
-     * @param shape точки лица
      * @return cv::Rect ограничивающий прямоугольник
      */
-    cv::Rect getRightEyeBoundingRect(const dlib::full_object_detection& shape) const noexcept;
+    cv::Rect getRightEyeBoundingRect() const noexcept;
 
     /**
      * @brief Получаем референсные точки для лица
@@ -51,6 +68,10 @@ public:
      */
     std::vector<cv::Point2f> getRefFacePoints() const;
 private:
+    dlib::shape_predictor m_sp; //68 точек 
+    dlib::frontal_face_detector m_detector; //детектор лица
+    std::optional<dlib::full_object_detection> m_curDetection;
+
     /**
      * @brief Получаем главное лицо на картинке
      * @param img изображение
@@ -60,18 +81,18 @@ private:
     const dlib::rectangle& getPrimaryFaceRect(
                                         const dlib::array2d<dlib::rgb_pixel>& img, 
                                         const std::vector<dlib::rectangle>& faces) const noexcept;
+
+    /**
+     * @brief Получаем выборку точек глаз
+     * @return std::vector<cv::Point2d> подвыборка точек
+     */
+    std::vector<cv::Point2d> getEyePoints(std::size_t start, std::size_t end) const noexcept;
+
     /**
      * @brief Получаем ограничивающий прямоугольник для глаза по точкам face_shape_landmark
-     * @param shape точки лица
      * @return cv::Rect ограничивающий прямоугольник
      */
-    cv::Rect getEyeBoundingRect(const dlib::full_object_detection& shape, 
-                                                std::size_t start, std::size_t end) const noexcept;
-
-
-    dlib::shape_predictor m_sp; //68 точек 
-    dlib::frontal_face_detector m_detector; //детектор лица
-    std::optional<dlib::full_object_detection> m_curDetection;
+    cv::Rect getEyeBoundingRect(std::size_t start, std::size_t end) const noexcept;
 };
 
 #endif //_FACE_SHAPE_PREDICTOR_HPP_

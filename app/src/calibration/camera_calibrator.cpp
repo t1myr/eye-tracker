@@ -13,7 +13,7 @@
  * @brief Конструктор, сохраняющий путь к калибровочным данным
  * @param path 
  */
-CameraCalibrator::CameraCalibrator(std::shared_ptr<FrameCaptureEntity>& cap, const std::string& path) : 
+CameraCalibrator::CameraCalibrator(const std::shared_ptr<FrameCaptureEntity>& cap, const std::string& path) : 
                                                                     m_filePath(path),
                                                                     m_cap(cap)
 {
@@ -30,7 +30,7 @@ CameraCalibrator::CameraCalibrator(std::shared_ptr<FrameCaptureEntity>& cap, con
 /**
  * @brief Конструктор по умолчанию
  */
-CameraCalibrator::CameraCalibrator(std::shared_ptr<FrameCaptureEntity>& cap) : 
+CameraCalibrator::CameraCalibrator(const std::shared_ptr<FrameCaptureEntity>& cap) : 
                             CameraCalibrator(cap, CameraCalibrator::kCalibDataDefaultPath)
 {
 
