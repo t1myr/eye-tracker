@@ -43,13 +43,13 @@ public:
      * @brief Получаем выборку точек левого глаза
      * @return std::vector<cv::Point2d> подвыборка точек
      */
-    std::vector<cv::Point2d> getLeftEyePoints() const noexcept;
+    std::vector<cv::Point2i> getLeftEyePoints() const noexcept;
 
     /**
      * @brief Получаем выборку точек правого глаза
      * @return std::vector<cv::Point2d> подвыборка точек
      */
-    std::vector<cv::Point2d> getRightEyePoints() const noexcept;
+    std::vector<cv::Point2i> getRightEyePoints() const noexcept;
 
     /**
      * @brief Получаем ограничивающий прямоугольник для левого глаза
@@ -86,7 +86,7 @@ private:
      * @brief Получаем выборку точек глаз
      * @return std::vector<cv::Point2d> подвыборка точек
      */
-    std::vector<cv::Point2d> getEyePoints(std::size_t start, std::size_t end) const noexcept;
+    std::vector<cv::Point2i> getEyePoints(std::size_t start, std::size_t end) const noexcept;
 
     /**
      * @brief Получаем ограничивающий прямоугольник для глаза по точкам face_shape_landmark

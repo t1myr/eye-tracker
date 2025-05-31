@@ -45,7 +45,7 @@ std::unique_ptr<PackageTask::ExecuteBody> LocalGazeVectorTask::execute(
 /// @brief Вычисляем локальный вектор взгляда
 LocalGazeVectorTask::EyeEntity LocalGazeVectorTask::computeLocalGaze(
     const cv::Point2d& irisCenter, 
-    const std::vector<cv::Point2d>& points) const
+    const std::vector<cv::Point2i>& points) const
 {
     EyeEntity entity;
     entity.eyeCenter = getEyeCenter(points);
@@ -60,17 +60,20 @@ LocalGazeVectorTask::EyeEntity LocalGazeVectorTask::computeLocalGaze(
  * @brief Считаем центр глаза как центр масс описывающих его точек
  * @param points точки глаза
  */
-cv::Point2d LocalGazeVectorTask::getEyeCenter(const std::vector<cv::Point2d>& points) const
+cv::Point2d LocalGazeVectorTask::getEyeCenter(const std::vector<cv::Point2i>& points) const
 {
     cv::Point2d centroid(0.0, 0.0);
+    cv::Point2d borderPoint(points.front().x, points.front().y); //Граничная точка
     for (const auto& pt : points) {
+        borderPoint.x = std::min(borderPoint.x, static_cast<double>(pt.x));
+        borderPoint.y = std::min(borderPoint.y, static_cast<double>(pt.y));
         centroid.x += pt.x;
         centroid.y += pt.y;
     }
     centroid.x /= points.size();
     centroid.y /= points.size();
 
-    return centroid;
+    return centroid - borderPoint;
 }
 
 /// @brief Считаем радиус глаза
@@ -89,7 +92,7 @@ cv::Vec3d LocalGazeVectorTask::getLocalGazeVector(const cv::Point2d& eyeCenter,
                                                     double eyeRadius) const
 {
     cv::Vec3d endPoint = {irisCenter.x - eyeCenter.x, irisCenter.y - irisCenter.y, 0};
-    double zSquared = eyeRadius * eyeRadius - irisCenter.x * irisCenter.x - irisCenter.y * irisCenter.y;
+    double zSquared = eyeRadius * eyeRadius - endPoint[0] * endPoint[0] - endPoint[1] * endPoint[1];
     ASSERT_PRINTF(zSquared >= 0, "Depth coord of local gaze vector negative!!!");
     endPoint[2] = cv::sqrt(zSquared);
     //отправляем нормализованный вектор

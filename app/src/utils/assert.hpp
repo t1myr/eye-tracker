@@ -1,7 +1,6 @@
 #ifndef _ASSERT_HPP_
 #define _ASSERT_HPP_
 
-#include <spdlog/spdlog.h>
 #include <cstdlib>
 #include <string_view>
 

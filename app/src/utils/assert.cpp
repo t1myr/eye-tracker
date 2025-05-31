@@ -1,5 +1,7 @@
 #include "assert.hpp"
 
+#include "logging/logger.hpp"
+
 /// @brief Проверяем выражение
 void assert_printf(bool expr, std::string_view file, int line, std::string_view msg)
 {

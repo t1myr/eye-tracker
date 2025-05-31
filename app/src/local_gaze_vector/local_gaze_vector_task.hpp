@@ -17,7 +17,7 @@ public:
     struct EyeConfig
     {
         cv::Mat roi;
-        std::vector<cv::Point2d> eyePoints;
+        std::vector<cv::Point2i> eyePoints;
     };
 
     /// @brief Тело запроса
@@ -50,10 +50,10 @@ private:
     std::unique_ptr<ExecuteBody> execute(std::unique_ptr<ExecuteBody>&& body) override;
     /// @brief Вычисляем локальный вектор взгляда
     EyeEntity computeLocalGaze(const cv::Point2d& irisCenter, 
-                                const std::vector<cv::Point2d>& points) const;
+                                const std::vector<cv::Point2i>& points) const;
 
     /// @brief Считаем центр глаза
-    cv::Point2d getEyeCenter(const std::vector<cv::Point2d>& points) const;
+    cv::Point2d getEyeCenter(const std::vector<cv::Point2i>& points) const;
     /// @brief Считаем радиус глаза
     double getEyeRadius(const cv::Point2d& center, 
                         const cv::Point2d& leftCorner) const;

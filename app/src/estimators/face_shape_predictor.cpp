@@ -61,18 +61,18 @@ bool FaceShapePredictor::updateFace(const cv::Mat& frame)
 
 /**
  * @brief Получаем выборку точек левого глаза
- * @return std::vector<cv::Point2d> подвыборка точек
+ * @return std::vector<cv::Point2i> подвыборка точек
  */
-std::vector<cv::Point2d> FaceShapePredictor::getLeftEyePoints() const noexcept
+std::vector<cv::Point2i> FaceShapePredictor::getLeftEyePoints() const noexcept
 {
     return getEyePoints(kLeftEyeStartPoint, kLeftEyeEndPoint);
 }
 
 /**
  * @brief Получаем выборку точек правого глаза
- * @return std::vector<cv::Point2d> подвыборка точек
+ * @return std::vector<cv::Point2i> подвыборка точек
  */
-std::vector<cv::Point2d> FaceShapePredictor::getRightEyePoints() const noexcept
+std::vector<cv::Point2i> FaceShapePredictor::getRightEyePoints() const noexcept
 {
     return getEyePoints(kRightEyeStartPoint, kRightEyeEndPoint);
 }
@@ -132,11 +132,11 @@ const dlib::rectangle& FaceShapePredictor::getPrimaryFaceRect(
  * @brief Получаем выборку точек глаз
  * @return std::vector<cv::Point2d> подвыборка точек
  */
-std::vector<cv::Point2d> FaceShapePredictor::getEyePoints(std::size_t start, std::size_t end) const noexcept
+std::vector<cv::Point2i> FaceShapePredictor::getEyePoints(std::size_t start, std::size_t end) const noexcept
 {
     if(!m_curDetection)
         return {};
-    std::vector<cv::Point2d> eyePoints;
+    std::vector<cv::Point2i> eyePoints;
     for (auto i = start; i <= end; ++i)
     {
         eyePoints.emplace_back(m_curDetection->part(i).x(), m_curDetection->part(i).y());
